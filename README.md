@@ -4,7 +4,6 @@ Uses Jev to check whether a branch's diff satisfies its ticket, enforced via a S
 
 ## Setup
 
-1. `python3 scripts/setup.py` — writes your TypeSafe/ADO credentials to `~/.config/jev-prd-check/.env`.
-2. Install [uv](https://docs.astral.sh/uv/) — dependencies resolve automatically via `uv run`, no pip install or venv needed.
-3. Claude Code: `claude plugin marketplace add JosephHardy91/jev_prd_check && claude plugin install jev-prd-check@jev-prd-check`
-4. Codex CLI: `python3 scripts/setup.py --codex`
+1. Install [uv](https://docs.astral.sh/uv/) — dependencies resolve automatically via `uv run`, no pip install or venv needed.
+2. Claude Code: `claude plugin marketplace add JosephHardy91/jev_prd_check && claude plugin install jev-prd-check@jev-prd-check`, then `/plugin configure jev-prd-check` in a session to enter your TypeSafe/ADO credentials.
+3. Codex CLI: `python3 scripts/setup.py --codex`

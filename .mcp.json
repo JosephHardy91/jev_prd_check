@@ -8,7 +8,12 @@
         "${CLAUDE_PLUGIN_ROOT}/requirements.txt",
         "python3",
         "${CLAUDE_PLUGIN_ROOT}/mcp_server.py"
-      ]
+      ],
+      "env": {
+        "TYPESAFE_API_KEY": "${user_config.typesafe_api_key}",
+        "ADO_ORG_PROJECT": "${user_config.ado_org_project}",
+        "ADO_PAT": "${user_config.ado_pat}"
+      }
     }
   }
 }

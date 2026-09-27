@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Interactive setup for jev-prd-check: collects the keys/slugs this plugin
-needs and writes them to a stable, install-method-independent config file
-(~/.config/jev-prd-check/.env), then prints how to register the plugin with
-Claude Code and/or Codex CLI.
+"""Setup for Codex CLI and local dev use.
+
+Claude Code collects TYPESAFE_API_KEY/ADO_ORG_PROJECT/ADO_PAT itself via
+plugin.json's userConfig (prompted when you enable the plugin, or run
+`/plugin configure jev-prd-check` in a session) -- sensitive values go to
+its secure credential store, not a file. This script covers the two things
+userConfig doesn't: Codex CLI (no such mechanism) and local dev/testing
+(running scripts/*.py directly, outside any harness).
 
 Usage:
     python3 scripts/setup.py [--codex]
@@ -76,7 +80,9 @@ def main() -> None:
     )
     print(
         "\nClaude Code: claude plugin marketplace add JosephHardy91/jev_prd_check "
-        "then claude plugin install jev-prd-check@jev-prd-check"
+        "&& claude plugin install jev-prd-check@jev-prd-check, then "
+        "/plugin configure jev-prd-check in a session to enter credentials "
+        "(claude plugin install alone doesn't show that prompt)."
     )
 
     codex_config = Path.home() / ".codex" / "config.toml"

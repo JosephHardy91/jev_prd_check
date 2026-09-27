@@ -4,5 +4,27 @@
   "version": "0.1.0",
   "author": {
     "name": "Joe Hardy"
+  },
+  "userConfig": {
+    "typesafe_api_key": {
+      "type": "string",
+      "title": "TypeSafe API key",
+      "description": "For Jev calls (see https://docs.typesafe.ai)",
+      "sensitive": true,
+      "required": true
+    },
+    "ado_org_project": {
+      "type": "string",
+      "title": "Azure DevOps org/project",
+      "description": "e.g. contoso/kubebot",
+      "required": true
+    },
+    "ado_pat": {
+      "type": "string",
+      "title": "Azure DevOps PAT",
+      "description": "Personal access token with Work Items: Read",
+      "sensitive": true,
+      "required": true
+    }
   }
 }
