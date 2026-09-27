@@ -89,8 +89,12 @@ def check_checkpoint(
     *,
     client: TypeSafeClient,
     threshold: float = DEFAULT_THRESHOLD,
+    criteria: list[str] | None = None,
 ) -> CheckpointResult:
-    criteria = split_criteria(task_text)
+    """criteria, if given, overrides the default bullets-or-whole split (see
+    jev_prd_check.decompose for a finer bullet/sentence/phrase cascade)."""
+    if criteria is None:
+        criteria = split_criteria(task_text)
     if not criteria:
         raise ValueError("task_text yielded no checkable criteria")
 
