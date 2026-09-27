@@ -1,0 +1,37 @@
+{
+  "name": "jev-prd-check",
+  "description": "Checks whether a branch's diff satisfies its ADO ticket via Jev. Runs as a SubagentStop/Stop hook so it can't be skipped by the agent it's checking, plus an MCP tool for ad hoc checks.",
+  "version": "0.1.0",
+  "mcpServers": {
+    "jev-prd-check": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp_server.py"]
+    }
+  },
+  "hooks": {
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python ${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py",
+            "timeout": 60,
+            "statusMessage": "Checking branch diff against its ADO ticket..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python ${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py",
+            "timeout": 60,
+            "statusMessage": "Checking branch diff against its ADO ticket..."
+          }
+        ]
+      }
+    ]
+  }
+}
