@@ -41,9 +41,13 @@ history to a point-in-time, take a following range of commits as the
 exists). No live agent run needed during development.
 
 ## Key Assumptions to Validate
-- [ ] Text-only judgment (task + diff, no test execution) is enough signal
-      for "did they address the requirement" — test against several kubebot
-      ranges and see where it clearly needs execution/test results instead.
+- [ ] Text-only judgment (task + diff, no test execution) is a legitimate,
+      independent signal for "did they address the requirement" — not a
+      weaker stand-in for behavioral proof. Behavioral tests aren't
+      objective ground truth either: someone still chose what to test and
+      how, which is its own judgment call. Treat this checker and any
+      future "behavioral-jev" (real env, real test run) as two independent
+      signals to combine, not a cheap-vs-authoritative pair.
 - [ ] Code-level bullet-splitting of `task_text` reliably yields independent,
       checkable criteria — spot-check `stories-autogen.md`'s actual bullet
       style; some bullets may be non-criteria guidance, not requirements.
@@ -69,9 +73,12 @@ tests/executing the diff as part of the judgment.
   wasted, tracker-specific work the core checker doesn't need.
 - **Multi-checkpoint sessions** — explicitly deferred; get one clean
   checkpoint right first, extend later.
-- **Executing the diff / running tests** — out of scope for a text-judgment
-  MVP; flagged as an assumption to revisit if satisfaction judgments prove
-  too shallow.
+- **Executing the diff / running tests** — a distinct future layer
+  ("behavioral-jev": real env, real test run) rather than a superior
+  replacement for this one. Its own tests carry the same subjectivity
+  problem this checker has, just moved to test-authorship time — not
+  in scope here, but worth designing as a peer signal later, not a
+  ground-truth override.
 - **Building the policy/consumption skill now** — premature before the core
   checker is validated against real(ish) data; the criticality→action mapping
   needs a working checker underneath it first.
