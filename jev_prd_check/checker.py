@@ -39,6 +39,20 @@ def split_criteria(task_text: str) -> list[str]:
 
 
 def build_questions(criteria: list[str]) -> dict[str, Noul]:
+    """Each question's instructions quotes the extracted criterion verbatim
+    (never a paraphrase or an LLM-rewritten question) and explicitly anchors
+    it to `diff`; `task_text` is passed as full, unmodified shared state so
+    Jev has the surrounding context an isolated fragment may need.
+
+    Tried moving the "check this against diff" framing out of instructions
+    and into criteria's true/false definitions instead (keeping instructions
+    as the bare criterion). That regressed a ground-truthed kubebot fixture:
+    a criterion that should fail (the diff never wires up launching the TUI)
+    went from a confident, correct fail (~0.38) to a stable, wrong pass
+    (~0.66-0.71) across repeated calls. Without the explicit anchor in
+    instructions, Jev reads it as "is this generally true of the code" rather
+    than "does this diff specifically implement it" -- keep the anchor here.
+    """
     return {
         f"criterion_{i}": Noul(
             instructions=(
