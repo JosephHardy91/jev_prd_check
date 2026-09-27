@@ -1,0 +1,14 @@
+{
+  "name": "jev-prd-check",
+  "description": "Marketplace for the jev-prd-check plugin",
+  "owner": {
+    "name": "Joe Hardy"
+  },
+  "plugins": [
+    {
+      "name": "jev-prd-check",
+      "source": "./",
+      "description": "Checks whether a branch's diff satisfies its ADO ticket via Jev."
+    }
+  ]
+}

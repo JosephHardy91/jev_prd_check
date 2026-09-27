@@ -54,10 +54,13 @@ based on how permanent you want this:
   ln -s /path/to/jev_prd_check ~/.claude/skills/jev-prd-check
   ```
   Claude Code auto-loads any folder there with a `.claude-plugin/plugin.json`.
-- **Share it with a team**, so everyone gets your updates: list it in a
-  [plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces)
-  — a `marketplace.json` with a `plugins` entry whose `source` points at
-  this directory, then `claude plugin marketplace add` + `claude plugin install`.
+- **Share it with a team**, so everyone gets your updates: this repo is
+  already its own marketplace (`.claude-plugin/marketplace.json`). From a
+  clone of it:
+  ```
+  claude plugin marketplace add ./
+  claude plugin install jev-prd-check@jev-prd-check
+  ```
 
 Verify any of these with `claude plugin validate /path/to/jev_prd_check`,
 and check what actually loaded with
