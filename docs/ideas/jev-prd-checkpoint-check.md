@@ -83,6 +83,29 @@ tests/executing the diff as part of the judgment.
   checker is validated against real(ish) data; the criticality→action mapping
   needs a working checker underneath it first.
 
+## Future Layer: Iterate-Until-Satisfied Dev Loop (not built yet)
+
+A likely real usage pattern: an agent is enacted with a skill that says
+"implement this PRD, run the jev checker, work its findings, then exit."
+A failing criterion becomes a signal to keep working, not just a report.
+
+This **cannot** be tested against the kubebot commit-replay fixtures. The
+"work the findings" step depends on the agent's own accumulated reasoning
+about why it made its choices — a subagent handed only "here's a diff, here's
+why criterion N failed" after the fact has no such history, and would be
+confabulating a plausible-sounding fix rather than continuing real reasoning.
+Replaying a historical end-commit as the "fix" doesn't test this either;
+there's no live iteration to observe.
+
+To test this loop for real: check out a fixture's `start_sha`, hand a fresh
+agent the PRD text only (not the real future commits), let it implement,
+run the checker, and let it react to its own failing findings with its own
+context. The historical `end_sha` becomes a reference to compare against
+afterward, not something to replay. This is expensive per trial (a full
+agent run, not a static check) and isn't a quick regression fixture the way
+the checker-validity harness is — build it separately, later, once the
+"implement → jev → iterate → exit" skill itself exists.
+
 ## Open Questions
 - Where does the kubebot repo live (local path or URL to clone)?
 - What does `stories-autogen.md` actually look like — one story per task,
