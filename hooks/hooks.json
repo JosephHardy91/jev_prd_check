@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"],
+            "timeout": 60,
+            "statusMessage": "Checking branch diff against its ADO ticket..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"],
+            "timeout": 60,
+            "statusMessage": "Checking branch diff against its ADO ticket..."
+          }
+        ]
+      }
+    ]
+  }
+}
