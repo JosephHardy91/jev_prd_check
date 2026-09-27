@@ -80,7 +80,9 @@ extracts the ticket id, fetches it from Azure DevOps, and checks the
 branch's diff against it. `scripts/run_kubebot_case.py` runs the same
 checker against a fixture file instead of a live branch — see
 `docs/prds/` for what a fixture looks like and why each one is grounded in
-a real issue rather than an invented one.
+a real issue rather than an invented one. It clones the kubebot repo into
+a temp directory and cleans up afterward; pass `--kubebot-repo <path>` to
+reuse an existing local checkout instead.
 
 ## Layout
 

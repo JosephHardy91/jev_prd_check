@@ -11,6 +11,7 @@ import argparse
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -19,16 +20,16 @@ from jev_prd_check.checker import check_checkpoint
 from jev_prd_check.env import load_dotenv
 from jev_prd_check.prd import load_prd_fixture
 
-KUBEBOT_REPO = Path.home() / "programming" / "kubebot"
+KUBEBOT_REPO_URL = "https://github.com/JosephHardy91/kubebot"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 load_dotenv(PROJECT_ROOT / ".env")
 
 
-def get_diff(start_sha: str, end_sha: str) -> str:
+def get_diff(repo: Path, start_sha: str, end_sha: str) -> str:
     result = subprocess.run(
         ["git", "diff", f"{start_sha}..{end_sha}"],
-        cwd=KUBEBOT_REPO,
+        cwd=repo,
         capture_output=True,
         text=True,
         check=True,
@@ -40,10 +41,22 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("prd_path", help="Path to a docs/prds/*.md fixture")
     parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument(
+        "--kubebot-repo",
+        help="Path to an existing kubebot checkout to reuse instead of cloning a fresh one",
+    )
     args = parser.parse_args()
 
     fixture = load_prd_fixture(args.prd_path)
-    diff = get_diff(fixture.start_sha, fixture.end_sha)
+
+    if args.kubebot_repo:
+        diff = get_diff(Path(args.kubebot_repo), fixture.start_sha, fixture.end_sha)
+    else:
+        with tempfile.TemporaryDirectory(prefix="jev-prd-check-kubebot-") as tmpdir:
+            print(f"Cloning {KUBEBOT_REPO_URL} into a temp directory...")
+            subprocess.run(["git", "clone", "--quiet", KUBEBOT_REPO_URL, tmpdir], check=True)
+            diff = get_diff(Path(tmpdir), fixture.start_sha, fixture.end_sha)
+
     print(f"Loaded fixture: {args.prd_path}")
     print(f"  start_sha={fixture.start_sha}")
     print(f"  end_sha={fixture.end_sha}")
