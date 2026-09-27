@@ -1,6 +1,6 @@
 # jev-prd-check
 
-Uses Jev to check whether a branch's diff satisfies its ticket, enforced via a SubagentStop/Stop hook so the checked agent can't skip it.
+Uses Jev to check whether a branch's diff satisfies its ticket (currently set to ADO/Azure Dev Ops tickets only), enforced via a SubagentStop/Stop hook so the checked agent can't skip it.
 
 ## Setup
 
