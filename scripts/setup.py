@@ -70,19 +70,21 @@ def main() -> None:
 
     codex_config = Path.home() / ".codex" / "config.toml"
     snippet_path = PROJECT_ROOT / "codex" / "config-snippet.toml"
-    print(f"\nCodex CLI: append {snippet_path} to {codex_config}.")
+    print(f"\nCodex CLI: append {snippet_path} to {codex_config}")
+    print(f"  (substituting {{{{JEV_PRD_CHECK_ROOT}}}} with {PROJECT_ROOT}).")
     if args.codex:
         if not snippet_path.is_file():
             print(f"  (snippet not found at {snippet_path}, skipping)")
         else:
             answer = input(f"  Append it to {codex_config} now? [y/N] ").strip().lower()
             if answer == "y":
+                snippet = snippet_path.read_text().replace("{{JEV_PRD_CHECK_ROOT}}", str(PROJECT_ROOT))
                 codex_config.parent.mkdir(parents=True, exist_ok=True)
                 with codex_config.open("a") as f:
-                    f.write("\n" + snippet_path.read_text())
+                    f.write("\n" + snippet)
                 print(f"  Appended to {codex_config}")
             else:
-                print("  Skipped -- copy it in yourself when ready.")
+                print("  Skipped -- copy it in yourself when ready (replace {{JEV_PRD_CHECK_ROOT}} with " f"{PROJECT_ROOT}).")
 
 
 if __name__ == "__main__":
