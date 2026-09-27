@@ -1,8 +1,14 @@
 {
   "mcpServers": {
     "jev-prd-check": {
-      "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp_server.py"]
+      "command": "uv",
+      "args": [
+        "run",
+        "--with-requirements",
+        "${CLAUDE_PLUGIN_ROOT}/requirements.txt",
+        "python3",
+        "${CLAUDE_PLUGIN_ROOT}/mcp_server.py"
+      ]
     }
   }
 }

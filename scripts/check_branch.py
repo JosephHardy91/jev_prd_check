@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from jev_prd_check.ado import fetch_ticket
 from jev_prd_check.checker import check_checkpoint
 from jev_prd_check.decompose import decompose
-from jev_prd_check.env import load_dotenv
+from jev_prd_check.env import load_config
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 TICKET_RE = re.compile(r"\d+")
@@ -66,7 +66,7 @@ def main() -> None:
     parser.add_argument("--threshold", type=float, default=0.5)
     args = parser.parse_args()
 
-    load_dotenv(PROJECT_ROOT / ".env")
+    load_config(PROJECT_ROOT)
 
     repo = Path(args.repo).resolve()
     branch = current_branch(repo)

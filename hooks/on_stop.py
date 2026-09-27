@@ -27,7 +27,7 @@ PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PLUGIN_ROOT))
 
 from jev_prd_check.branch_check import BranchCheckSkipped, run_branch_check  # noqa: E402
-from jev_prd_check.env import load_dotenv  # noqa: E402
+from jev_prd_check.env import load_config  # noqa: E402
 
 
 def _emit(payload: dict) -> None:
@@ -41,7 +41,7 @@ def main() -> None:
         payload = {}
 
     cwd = payload.get("cwd") or os.getcwd()
-    load_dotenv(PLUGIN_ROOT / ".env")
+    load_config(PLUGIN_ROOT)
     base = os.environ.get("JEV_BASE_BRANCH", "main")
     threshold = float(os.environ.get("JEV_THRESHOLD", "0.5"))
 
@@ -49,6 +49,15 @@ def main() -> None:
         outcome = run_branch_check(cwd, base=base, threshold=threshold)
     except BranchCheckSkipped:
         _emit({"suppressOutput": True})
+        return
+    except ImportError as e:
+        _emit(
+            {
+                "suppressOutput": True,
+                "systemMessage": f"jev-prd-check: missing dependency ({e}) -- run "
+                "`pip install -r requirements.txt` from a checkout of the repo.",
+            }
+        )
         return
     except Exception as e:  # never block the agent because OUR check errored
         _emit({"suppressOutput": True, "systemMessage": f"jev-prd-check error (ignored): {e}"})

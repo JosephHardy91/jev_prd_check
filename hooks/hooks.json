@@ -5,8 +5,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"],
+            "command": "uv",
+            "args": [
+              "run",
+              "--with-requirements",
+              "${CLAUDE_PLUGIN_ROOT}/requirements.txt",
+              "python3",
+              "${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"
+            ],
             "timeout": 60,
             "statusMessage": "Checking branch diff against its ADO ticket..."
           }
@@ -18,8 +24,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/.venv/bin/python",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"],
+            "command": "uv",
+            "args": [
+              "run",
+              "--with-requirements",
+              "${CLAUDE_PLUGIN_ROOT}/requirements.txt",
+              "python3",
+              "${CLAUDE_PLUGIN_ROOT}/hooks/on_stop.py"
+            ],
             "timeout": 60,
             "statusMessage": "Checking branch diff against its ADO ticket..."
           }

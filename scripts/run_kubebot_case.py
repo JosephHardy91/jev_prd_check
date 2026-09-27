@@ -17,13 +17,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from jev_prd_check.checker import check_checkpoint
-from jev_prd_check.env import load_dotenv
+from jev_prd_check.env import load_config
 from jev_prd_check.prd import load_prd_fixture
 
 KUBEBOT_REPO_URL = "https://github.com/JosephHardy91/kubebot"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-load_dotenv(PROJECT_ROOT / ".env")
+load_config(PROJECT_ROOT)
 
 
 def get_diff(repo: Path, start_sha: str, end_sha: str) -> str:

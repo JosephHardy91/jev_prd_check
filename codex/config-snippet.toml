@@ -6,18 +6,23 @@
 # for you, before appending this to ~/.codex/config.toml (or
 # <repo>/.codex/config.toml for a single project).
 #
+# Uses `uv run --with-requirements` so dependencies resolve into a cached,
+# ephemeral environment with no manual pip install and no bundled venv --
+# requires uv (https://docs.astral.sh/uv/) on PATH.
+#
 # Schema per Codex's current hooks/config docs -- verified against the
 # documented shape, not hand-tested against a live Codex install.
 
 [mcp.jev_prd_check]
-command = "{{JEV_PRD_CHECK_ROOT}}/.venv/bin/python"
-args = ["{{JEV_PRD_CHECK_ROOT}}/mcp_server.py"]
+command = "uv"
+args = ["run", "--with-requirements", "{{JEV_PRD_CHECK_ROOT}}/requirements.txt", "python3", "{{JEV_PRD_CHECK_ROOT}}/mcp_server.py"]
 
 [[hooks.SubagentStop]]
 
 [[hooks.SubagentStop.hooks]]
 type = "command"
-command = "{{JEV_PRD_CHECK_ROOT}}/.venv/bin/python {{JEV_PRD_CHECK_ROOT}}/hooks/on_stop.py"
+command = "uv"
+args = ["run", "--with-requirements", "{{JEV_PRD_CHECK_ROOT}}/requirements.txt", "python3", "{{JEV_PRD_CHECK_ROOT}}/hooks/on_stop.py"]
 timeout = 60
 statusMessage = "Checking branch diff against its ADO ticket..."
 
@@ -25,6 +30,7 @@ statusMessage = "Checking branch diff against its ADO ticket..."
 
 [[hooks.Stop.hooks]]
 type = "command"
-command = "{{JEV_PRD_CHECK_ROOT}}/.venv/bin/python {{JEV_PRD_CHECK_ROOT}}/hooks/on_stop.py"
+command = "uv"
+args = ["run", "--with-requirements", "{{JEV_PRD_CHECK_ROOT}}/requirements.txt", "python3", "{{JEV_PRD_CHECK_ROOT}}/hooks/on_stop.py"]
 timeout = 60
 statusMessage = "Checking branch diff against its ADO ticket..."

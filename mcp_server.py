@@ -17,12 +17,15 @@ from pathlib import Path
 PLUGIN_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PLUGIN_ROOT))
 
-from mcp.server.mcpserver import MCPServer  # noqa: E402
+try:
+    from mcp.server.mcpserver import MCPServer
+except ImportError:
+    sys.exit("jev-prd-check: missing dependency (mcp) -- run `pip install -r requirements.txt`")
 
 from jev_prd_check.branch_check import BranchCheckSkipped, run_branch_check  # noqa: E402
-from jev_prd_check.env import load_dotenv  # noqa: E402
+from jev_prd_check.env import load_config  # noqa: E402
 
-load_dotenv(PLUGIN_ROOT / ".env")
+load_config(PLUGIN_ROOT)
 
 server = MCPServer(
     name="jev-prd-check",

@@ -7,6 +7,9 @@ import os
 from pathlib import Path
 
 
+GLOBAL_ENV_PATH = Path.home() / ".config" / "jev-prd-check" / ".env"
+
+
 def load_dotenv(path: str | Path) -> None:
     path = Path(path)
     if not path.is_file():
@@ -17,3 +20,14 @@ def load_dotenv(path: str | Path) -> None:
             continue
         key, _, value = line.partition("=")
         os.environ.setdefault(key.strip(), value.strip())
+
+
+def load_config(local_root: Path | None = None) -> None:
+    """Load config from local_root/.env first (if given and present), then
+    the stable, install-method-independent GLOBAL_ENV_PATH. A plugin
+    installed from a marketplace is re-cloned into a cache directory with
+    no .env of its own, so GLOBAL_ENV_PATH is what actually works there;
+    local_root/.env remains a convenience override for local dev checkouts."""
+    if local_root is not None:
+        load_dotenv(local_root / ".env")
+    load_dotenv(GLOBAL_ENV_PATH)

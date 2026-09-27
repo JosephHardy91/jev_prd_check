@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Interactive setup for jev-prd-check: collects the keys/slugs this plugin
-needs and writes them to .env, then prints how to register the plugin with
+needs and writes them to a stable, install-method-independent config file
+(~/.config/jev-prd-check/.env), then prints how to register the plugin with
 Claude Code and/or Codex CLI.
 
 Usage:
-    .venv/bin/python scripts/setup.py [--codex]
+    python3 scripts/setup.py [--codex]
 
 --codex additionally appends codex/config-snippet.toml to
 ~/.codex/config.toml (asks first; never overwrites without confirmation).
@@ -14,10 +15,15 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from jev_prd_check.env import GLOBAL_ENV_PATH  # noqa: E402
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ENV_PATH = PROJECT_ROOT / ".env"
+ENV_PATH = GLOBAL_ENV_PATH
 
 FIELDS = [
     ("TYPESAFE_API_KEY", "TypeSafe API key (for Jev calls)", True),
@@ -58,14 +64,19 @@ def main() -> None:
         updated[key] = _prompt(label, existing.get(key), secret)
 
     lines = [f"{key}={value}" for key, value in updated.items() if value]
+    ENV_PATH.parent.mkdir(parents=True, exist_ok=True)
     ENV_PATH.write_text("\n".join(lines) + "\n")
     print(f"\nWrote {len(lines)} value(s) to {ENV_PATH}")
 
     print(
-        "\nClaude Code: install this directory as a plugin (its "
-        ".claude-plugin/plugin.json already declares the MCP server and "
-        "the SubagentStop/Stop hook) -- e.g. via a local marketplace entry "
-        "or `claude plugin install` pointed at this path."
+        "\nRequires uv (https://docs.astral.sh/uv/) on PATH -- the plugin "
+        "and hook run via `uv run --with-requirements requirements.txt`, "
+        "which resolves dependencies into a cached environment with no "
+        "manual pip install or bundled venv needed."
+    )
+    print(
+        "\nClaude Code: claude plugin marketplace add JosephHardy91/jev_prd_check "
+        "then claude plugin install jev-prd-check@jev-prd-check"
     )
 
     codex_config = Path.home() / ".codex" / "config.toml"
