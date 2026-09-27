@@ -1,0 +1,108 @@
+"""Core checkpoint checker.
+
+Judges whether a diff satisfies a PRD task, for one clean checkpoint (a
+single task_text + a single diff). Deliberately not a Claude Code skill: it
+must be callable only by something outside the tested agent's own tool
+surface, so the agent under test can't skip or bias the check.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+
+from typesafe_sdk import Noul, NoulCriteria, TypeSafeClient
+
+DEFAULT_THRESHOLD = 0.5
+
+_BULLET_START_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(\S.*)$")
+_CONTINUATION_RE = re.compile(r"^\s+(\S.*)$")
+
+
+def split_criteria(task_text: str) -> list[str]:
+    """Split task_text into checkable criteria.
+
+    One criterion per markdown bullet if any are present -- including bullets
+    that wrap onto indented continuation lines -- otherwise the whole
+    task_text is a single criterion.
+    """
+    bullets: list[str] = []
+    for line in task_text.splitlines():
+        if m := _BULLET_START_RE.match(line):
+            bullets.append(m.group(1).strip())
+        elif bullets and line.strip() and (m := _CONTINUATION_RE.match(line)):
+            bullets[-1] = f"{bullets[-1]} {m.group(1).strip()}"
+    if bullets:
+        return bullets
+    stripped = task_text.strip()
+    return [stripped] if stripped else []
+
+
+def build_questions(criteria: list[str]) -> dict[str, Noul]:
+    return {
+        f"criterion_{i}": Noul(
+            instructions=(
+                f'Does the code change in `diff` satisfy this specific requirement: "{criterion}"? '
+                "Use `task_text` only for surrounding context -- judge satisfaction of this "
+                "requirement alone, not the task as a whole."
+            ),
+            criteria=NoulCriteria(
+                true=(
+                    "The diff contains changes that directly implement or fulfill this "
+                    "requirement."
+                ),
+                false=(
+                    "The diff does not address this requirement, addresses it only partially "
+                    "or superficially, or is unrelated to it."
+                ),
+            ),
+        )
+        for i, criterion in enumerate(criteria)
+    }
+
+
+@dataclass(frozen=True)
+class CriterionVerdict:
+    criterion: str
+    probability: float
+    satisfied: bool
+
+
+@dataclass(frozen=True)
+class CheckpointResult:
+    task_text: str
+    diff: str
+    verdicts: list[CriterionVerdict]
+
+    @property
+    def overall_satisfied(self) -> bool:
+        return all(v.satisfied for v in self.verdicts)
+
+    @property
+    def failing(self) -> list[CriterionVerdict]:
+        return [v for v in self.verdicts if not v.satisfied]
+
+
+def check_checkpoint(
+    task_text: str,
+    diff: str,
+    *,
+    client: TypeSafeClient,
+    threshold: float = DEFAULT_THRESHOLD,
+) -> CheckpointResult:
+    criteria = split_criteria(task_text)
+    if not criteria:
+        raise ValueError("task_text yielded no checkable criteria")
+
+    questions = build_questions(criteria)
+    response = client.system_one(state={"task_text": task_text, "diff": diff}, questions=questions)
+
+    verdicts = [
+        CriterionVerdict(
+            criterion=criterion,
+            probability=(p := response.nouls[f"criterion_{i}"].noul),
+            satisfied=p >= threshold,
+        )
+        for i, criterion in enumerate(criteria)
+    ]
+    return CheckpointResult(task_text=task_text, diff=diff, verdicts=verdicts)
