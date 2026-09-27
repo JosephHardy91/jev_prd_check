@@ -16,24 +16,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from jev_prd_check.checker import check_checkpoint
+from jev_prd_check.env import load_dotenv
 from jev_prd_check.prd import load_prd_fixture
 
 KUBEBOT_REPO = Path.home() / "programming" / "kubebot"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-
-def _load_dotenv(path: Path) -> None:
-    if not path.is_file():
-        return
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip())
-
-
-_load_dotenv(PROJECT_ROOT / ".env")
+load_dotenv(PROJECT_ROOT / ".env")
 
 
 def get_diff(start_sha: str, end_sha: str) -> str:
