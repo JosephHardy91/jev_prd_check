@@ -35,12 +35,39 @@ Run the interactive setup once to collect the credentials this needs:
 .venv/bin/python scripts/setup.py --codex  # also offers to register with Codex
 ```
 
-Then register the plugin with whichever harness you use:
+Then register the plugin with whichever harness you use.
 
-- **Claude Code**: install this directory as a plugin — `.claude-plugin/plugin.json`
-  already declares the MCP server and the hook.
-- **Codex CLI**: append `codex/config-snippet.toml` to `~/.codex/config.toml`
-  (or let `setup.py --codex` do it).
+### Claude Code
+
+The plugin manifest (`.claude-plugin/plugin.json`), `.mcp.json`, and
+`hooks/hooks.json` are already set up — no extra files to write. Pick
+based on how permanent you want this:
+
+- **Try it for one session**, no install:
+  ```
+  claude --plugin-dir /path/to/jev_prd_check
+  ```
+- **Load it every session**, no marketplace: symlink (don't copy — the
+  plugin needs to keep seeing this checkout's `.venv` and `.env`) this
+  directory into your personal skills directory:
+  ```
+  ln -s /path/to/jev_prd_check ~/.claude/skills/jev-prd-check
+  ```
+  Claude Code auto-loads any folder there with a `.claude-plugin/plugin.json`.
+- **Share it with a team**, so everyone gets your updates: list it in a
+  [plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces)
+  — a `marketplace.json` with a `plugins` entry whose `source` points at
+  this directory, then `claude plugin marketplace add` + `claude plugin install`.
+
+Verify any of these with `claude plugin validate /path/to/jev_prd_check`,
+and check what actually loaded with
+`claude --plugin-dir /path/to/jev_prd_check plugin details jev-prd-check`
+(should show 2 hooks and 1 MCP server).
+
+### Codex CLI
+
+Append `codex/config-snippet.toml` to `~/.codex/config.toml`
+(or let `setup.py --codex` do it).
 
 ## Using it directly
 
@@ -63,7 +90,7 @@ a real issue rather than an invented one.
 | `scripts/` | CLI entry points |
 | `hooks/` | Harness hook scripts |
 | `mcp_server.py` | The MCP tool surface |
-| `.claude-plugin/`, `codex/` | Per-harness registration |
+| `.claude-plugin/`, `.mcp.json`, `hooks/hooks.json`, `codex/` | Per-harness registration |
 | `docs/ideas/` | Design rationale, assumptions, and deferred future work |
 | `docs/prds/` | Ground-truthed test fixtures |
 
