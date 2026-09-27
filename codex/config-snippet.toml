@@ -1,0 +1,29 @@
+# Codex CLI registration for jev-prd-check.
+#
+# Codex has no plugin-root variable like Claude Code's ${CLAUDE_PLUGIN_ROOT},
+# so paths here are absolute to this checkout. Append this to
+# ~/.codex/config.toml (or <repo>/.codex/config.toml for a single project),
+# or run scripts/setup.py --codex to have it do this for you.
+#
+# Schema per Codex's current hooks/config docs -- verified against the
+# documented shape, not hand-tested against a live Codex install.
+
+[mcp.jev_prd_check]
+command = "/home/joe/programming/_AI/jev_prd_check/.venv/bin/python"
+args = ["/home/joe/programming/_AI/jev_prd_check/mcp_server.py"]
+
+[[hooks.SubagentStop]]
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = "/home/joe/programming/_AI/jev_prd_check/.venv/bin/python /home/joe/programming/_AI/jev_prd_check/hooks/on_stop.py"
+timeout = 60
+statusMessage = "Checking branch diff against its ADO ticket..."
+
+[[hooks.Stop]]
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = "/home/joe/programming/_AI/jev_prd_check/.venv/bin/python /home/joe/programming/_AI/jev_prd_check/hooks/on_stop.py"
+timeout = 60
+statusMessage = "Checking branch diff against its ADO ticket..."
